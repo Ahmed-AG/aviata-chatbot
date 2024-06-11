@@ -362,10 +362,10 @@ You can also access the back end going to `http://aviata-backend.sans.labs:8000/
 
 ## TASK 4: Network control
 
+#TODO
 
 
-
-## Cleanup
+## TASK 5: Cleanup
 ```bash
 kubectl -n aviata-chatbot delete -f deploy-k8s/weaviate-vectordb.yaml
 kubectl -n aviata-chatbot delete -f deploy-k8s/backend.yaml
