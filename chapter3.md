@@ -365,9 +365,16 @@ Use your browser to access `http://aviata-chatbot.sans.labs`.
 You can also access the back end going to `http://aviata-backend.sans.labs:8000/api/llm?q="tell me a story"`
 
 ## TASK 4: Network control
+kubernetes can be used by many teams to run many applications, workloads, systems
+Kubernetes is a powerful platform that allows multiple teams to run various applications, workloads, and systems efficiently. Effective segmentation between different applications, namespaces, services, and Pods is a cornerstone of network access control within Kubernetes. This segmentation ensures that each component operates within its defined boundaries, enhancing security, and reducing the risk of unauthorized access. By isolating resources and managing permissions at a granular level, Kubernetes facilitates a secure and organized environment where teams can deploy and manage their applications without interference, maintaining the integrity and performance of the overall system.
 
-#TODO
+There are multiple ways for us to apply network access in K8s. We will give one example that uses apiVersion: networking.k8s.io/v1.
+As a prerequisite, Minikube needs to be restarted with the --cni calico. To do so run the following:
 
+```bash
+minikube stop
+minikube start --subnet='192.168.49.0/24' --kubernetes-version=v1.28.4
+```
 
 ## TASK 5: Cleanup
 ```bash
