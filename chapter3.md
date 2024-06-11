@@ -5,12 +5,6 @@ This tutorial guides you through deploying a Aviata-chatbot on Kubernetes. Aviat
 - A backend  built using Python and FastAPI
 - A frontend using NGINX to host a HTML and JavaScript UI.
 
-## Prerequisites
-
-- Kubernetes cluster set up (e.g., using EKS on AWS)
-- `kubectl` configured to access your cluster
-- AWS CLI configured with appropriate IAM credentials
-
 ## TASK 1: Setting up Minikube
 ### Installing Minikube
 From inside your LAB VM execute the following:
@@ -34,6 +28,7 @@ Execute the following:
 The next step would be to start Minikube. We also need to enable `metalLB` which will allow us to map/expose our services externally.
 
 ```bash
+minikube delete
 minikube start --subnet='192.168.49.0/24' --kubernetes-version=v1.28.4
 minikube addons enable metallb
 ```
@@ -55,7 +50,7 @@ Execute the following commands to clone the repo and configure `MetalLB`:
 cd ~/code
 git clone https://github.com/Ahmed-AG/aviata-chatbot.git
 cd aviata-chatbot
-kubectl kubectl apply -f deploy-k8s/metallb-config.yaml
+kubectl apply -f deploy-k8s/metallb-config.yaml
 ```
 Congratulations, your environment is ready!
 
@@ -84,6 +79,11 @@ kubectl create secret -n aviata-chatbot generic openai --from-literal=openai-key
 
 Different components of the application will utilize this key for communication with OpenAI.
 
+To verify your work, execute the following:
+
+```bash
+kubectl -n aviata-chatbot get secrets
+```
 ### Creating a ConfigMap
 
 In Kubernetes, not all shared data between application components needs to be kept secret; `ConfigMap` provides an alternative method for sharing information. Execute the following command to apply the configuration defined in the `configmap.yaml` file within the `aviata-chatbot` namespace:
@@ -192,9 +192,6 @@ kubectl get service weaviate -n aviata-chatbot
 ```bash
 kubectl get service weaviate -n aviata-chatbot -o json
 ```
-<!-- ```bash
-kubectl get service weaviate -n aviata-chatbot -o json | jq -r '.spec.clusterIP' 
-``` -->
 
 ### Applying The Backend
 
@@ -203,6 +200,7 @@ To deploy the backend, execute the following command:
 
 
 ```bash
+cd ~/code/aviata-chatbot
 kubectl -n aviata-chatbot apply -f deploy-k8s/backend.yaml
 ```
 
@@ -238,6 +236,7 @@ kubectl -n aviata-chatbot  get service
 ```bash
 kubectl -n aviata-chatbot  get po
 ```
+
 Sample Output:
 ```bash
 % kubectl -n aviata-chatbot  get service
@@ -264,15 +263,24 @@ kubectl -n aviata-chatbot apply -f deploy-k8s/frontend.yaml
 
 Within our JavaScript code, there's a reference to our backend server that requires updating. While this task can be automated within a pipeline, for our lab purposes, we'll perform it manually by executing the following command.
 
+You can inspect your work using the following commands:
+
 ```bash
-FRONTEND_POD_NAME=$(kubectl -n aviata-chatbot  get po -o json |jq -r '.items[].metadata.name' | grep frontend)
-echo $FRONTEND_POD_NAME
-
-BACKEND_LB_URL=http://$(kubectl -n aviata-chatbot get service backend -o json |jq -r '.status.loadBalancer.ingress[].hostname'):8000
-echo $BACKEND_LB_URL
-
-kubectl -n aviata-chatbot exec -ti $FRONTEND_POD_NAME -- /bin/sh -c "sed -i \"s#<URL_PLACEHOLDER>#$BACKEND_LB_URL#g\" /usr/share/nginx/html/index.html"
+kubectl -n aviata-chatbot get service
 ```
+
+Sample output should look like this:
+
+```bash
+student@ace135.sans.labs ~/code/aviata-chatbot (main)$ kubectl -n aviata-chatbot get service
+NAME       TYPE           CLUSTER-IP      EXTERNAL-IP      PORT(S)          AGE
+backend    LoadBalancer   10.103.47.225   192.168.49.200   8000:31620/TCP   2m12s
+frontend   LoadBalancer   10.99.1.241     192.168.49.201   80:30000/TCP     65s
+weaviate   ClusterIP      10.111.132.56   <none>           8080/TCP         4m7s
+student@ace135.sans.labs ~/code/aviata-chatbot (main)$ 
+```
+
+Notice that the `backend` and the `frontend` both have an external IP. however, the `weaviate` DB does not. 
 
 Great work so far! Let us review what we have created so far:
 
@@ -282,6 +290,33 @@ kubectl -n aviata-chatbot get pods -o wide
 kubectl -n aviata-chatbot get service -o wide
 kubectl -n aviata-chatbot get configmap
 kubectl -n aviata-chatbot get secrets
+```
+Sample output:
+
+```bash
+student@ace135.sans.labs ~/code/aviata-chatbot (main)$ kubectl -n aviata-chatbot get deployment -o wide
+NAME                  READY   UP-TO-DATE   AVAILABLE   AGE     CONTAINERS    IMAGES                             SELECTOR
+backend-deployment    1/1     1            1           4m20s   backend       ahmedag/backend                    app=backend
+frontend-deployment   1/1     1            1           3m13s   backend       ahmedag/frontend                   app=frontend
+weaviate-db           1/1     1            1           6m15s   weaviate-db   semitechnologies/weaviate:1.23.9   app=weaviate
+student@ace135.sans.labs ~/code/aviata-chatbot (main)$ kubectl -n aviata-chatbot get pods -o wide
+NAME                                   READY   STATUS    RESTARTS   AGE     IP           NODE       NOMINATED NODE   READINESS GATES
+backend-deployment-74876d5497-sfrv6    1/1     Running   0          4m20s   10.244.0.5   minikube   <none>           <none>
+frontend-deployment-6fbfd49487-nx8hz   1/1     Running   0          3m13s   10.244.0.6   minikube   <none>           <none>
+weaviate-db-97f46c9b6-n29l5            1/1     Running   0          6m15s   10.244.0.4   minikube   <none>           <none>
+student@ace135.sans.labs ~/code/aviata-chatbot (main)$ kubectl -n aviata-chatbot get service -o wide
+NAME       TYPE           CLUSTER-IP      EXTERNAL-IP      PORT(S)          AGE     SELECTOR
+backend    LoadBalancer   10.103.47.225   192.168.49.200   8000:31620/TCP   4m20s   app=backend
+frontend   LoadBalancer   10.99.1.241     192.168.49.201   80:30000/TCP     3m13s   app=frontend
+weaviate   ClusterIP      10.111.132.56   <none>           8080/TCP         6m15s   app=weaviate
+student@ace135.sans.labs ~/code/aviata-chatbot (main)$ kubectl -n aviata-chatbot get configmap
+NAME                 DATA   AGE
+backend-deployment   2      6m57s
+kube-root-ca.crt     1      9m50s
+student@ace135.sans.labs ~/code/aviata-chatbot (main)$ kubectl -n aviata-chatbot get secrets
+NAME     TYPE     DATA   AGE
+openai   Opaque   1      9m7s
+student@ace135.sans.labs ~/code/aviata-chatbot (main)$ 
 ```
 
 ### Testing connectivity
@@ -312,6 +347,11 @@ Sample output:
 
 If you received a message like that, congratulations! This indicates that your frontend successfully accessed your backend, and your backend was able to communicate successfully with the OpenAI API.
 
+Exit the container by executing:
+```bash
+exit
+```
+
 ### Set DNS configuration
 
 To be able to access Aviata-chatbot's UI, run the following command and open the link in your browser:
@@ -319,15 +359,15 @@ To be able to access Aviata-chatbot's UI, run the following command and open the
 ```bash
 BACKEND_IP=$(kubectl -n aviata-chatbot get service backend -o json |jq -r '.status.loadBalancer.ingress[].ip')
 echo $BACKEND_IP
+sudo -- sh -c "echo \"$BACKEND_IP  aviata-backend.sans.labs\" >> /etc/hosts"
+cat /etc/hosts
+```
 
+```bash
 FRONTEND_IP=$(kubectl -n aviata-chatbot get service frontend -o json |jq -r '.status.loadBalancer.ingress[].ip')
 echo $FRONTEND_IP
-
-sudo -- sh -c "echo \"$BACKEND_IP  aviata-backend.sans.labs\" >> /etc/hosts"
 sudo -- sh -c "echo \"$FRONTEND_IP  aviata-chatbot.sans.labs\" >> /etc/hosts"
-
-FRONTEND_URL=http://aviata-chatbot.sans.labs
-echo $FRONTEND_URL
+cat /etc/hosts
 ```
 
 This sequence of commands retrieves the IP addresses for the backend and frontend services in the aviata-chatbot namespace from their respective Kubernetes load balancers and stores them in the BACKEND_IP and FRONTEND_IP variables. It then updates the /etc/hosts file with these IP addresses, associating them with the hostnames aviata-backend.sans.labs and aviata-chatbot.sans.labs respectively, using sudo to gain the necessary permissions.
