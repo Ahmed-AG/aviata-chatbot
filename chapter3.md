@@ -6,25 +6,9 @@ This tutorial guides you through deploying a Aviata-chatbot on Kubernetes. Aviat
 - A frontend using NGINX to host a HTML and JavaScript UI.
 
 ## TASK 1: Setting up Minikube
-### Installing Minikube
-From inside your LAB VM execute the following:
-
-```bash
-curl -sLo /tmp/minikube-linux-amd64 https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
-sudo install -m 0755 /tmp/minikube-linux-amd64 /usr/local/bin/minikube
-```
-
-These commands download the latest Minikube binary to the /tmp directory and installs it to /usr/local/bin
-
-### Configuring DNS
-The following command appends a range of IP addresses (192.168.49.200 to 192.168.49.220) with corresponding hostnames (lb-200.sans.labs to lb-220.sans.labs) to the /etc/hosts file.
-Execute the following:
-
-```bash
-(for i in {200..220}; do echo "192.168.49.$i  lb-${i}.sans.labs"; done ) | sudo tee -a /etc/hosts
-```
 
 ### Starting Minikube
+Minikube is already installed on your VM. You might need to delete a previous cluster by executing `minikube delete` before starting up Minikube.
 The next step would be to start Minikube. We also need to enable `metalLB` which will allow us to map/expose our services externally.
 
 ```bash
