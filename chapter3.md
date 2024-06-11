@@ -344,13 +344,17 @@ To be able to access Aviata-chatbot's UI, run the following command and open the
 BACKEND_IP=$(kubectl -n aviata-chatbot get service backend -o json |jq -r '.status.loadBalancer.ingress[].ip')
 echo $BACKEND_IP
 sudo -- sh -c "echo \"$BACKEND_IP  aviata-backend.sans.labs\" >> /etc/hosts"
-cat /etc/hosts
 ```
 
 ```bash
 FRONTEND_IP=$(kubectl -n aviata-chatbot get service frontend -o json |jq -r '.status.loadBalancer.ingress[].ip')
 echo $FRONTEND_IP
 sudo -- sh -c "echo \"$FRONTEND_IP  aviata-chatbot.sans.labs\" >> /etc/hosts"
+```
+
+Take a look at `/etc/hosts`:
+
+```bash
 cat /etc/hosts
 ```
 
