@@ -1,0 +1,137 @@
+<!-- <!DOCTYPE html> -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Basic Chat App</title>
+    <link rel="icon" type="image/png" href="chaticon.png">
+    <style>
+      body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #f4f4f4;
+    }
+
+    #chat-container {
+        width: 80%;
+        height: 80%;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        background-color: #fff;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    #chat-box {
+        flex: 1;
+        padding: 10px;
+        overflow-y: auto;
+        border-bottom: 1px solid #ccc;
+    }
+
+    #chat-input {
+        border: none;
+        padding: 10px;
+        width: calc(100% - 50px);
+        box-sizing: border-box;
+        border-top: 1px solid #ccc;
+    }
+    #chat-response {
+        width: 100%;
+        height: 100%;
+        border: none;
+        padding: 10px;
+        width: calc(100% - 50px);
+        box-sizing: border-box;
+        border-top: 1px solid #ccc;
+    }
+
+    #send-button {
+        float: right;
+        width: 50px;
+        border: none;
+        background-color: #007bff;
+        color: white;
+        cursor: pointer;
+        border-top: 1px solid #ccc;
+    }
+
+    #send-button:hover {
+        background-color: #0056b3;
+    }
+
+    </style>
+    
+</head>
+<body>
+    <div id="chat-container">
+        <!-- <div id="chat-response-box"> -->
+        <textarea id="chat-response" readonly placeholder="Hello from your chatbot"></textarea>
+        <!-- </div> -->
+
+        <div id="chat-box"></div>
+        <input type="text" id="chat-input" placeholder="Type a message...">
+        <button id="send-button">Send</button>
+    </div>
+</body>
+
+<script>
+  document.getElementById('send-button').addEventListener('click', sendToChat);
+  document.getElementById('chat-input').addEventListener('keypress', enterToChat);
+  
+  // Functions
+  function enterToChat(){
+    if (event.key === 'Enter') {
+        sendToChat();
+    }
+  }
+
+  async function sendToChat(){
+    var userInputElement = document.getElementById('chat-input')
+    var userInputValue = userInputElement.value
+    var chatResponseElement = document.getElementById('chat-response')
+    
+    // Update chat box with user's input
+    var newResponseElementValue = chatResponseElement.value + "\nUser: " + userInputValue
+    chatResponseElement.value = newResponseElementValue
+    chatResponseElement.scrollTop = chatResponseElement.scrollHeight;
+
+    var llmResponse = await sendToLLM(userInputValue)
+
+    // Update chat box with input
+    var newResponseElementValue = chatResponseElement.value + "\nAviata-chatbot: " + llmResponse
+    chatResponseElement.value = newResponseElementValue
+    userInputElement.value = ""
+    chatResponseElement.scrollTop = chatResponseElement.scrollHeight;
+
+  }
+
+  async function sendToLLM(userInputValue){
+    let llmResponse;
+
+    const apiUrl = 'http://aviata-backend.sans.labs:8000/api/llm'; //TODO: Make it a variable
+    const apiURLwithParameters = apiUrl + '?q=\"' + userInputValue + '\"';
+
+    var response = await fetch(apiURLwithParameters, {
+        method: 'GET',
+        mode: 'cors', //Default Option
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }
+    )
+    .then(response=>response.json())
+    .then(data=>{ 
+      console.log(data)
+      llmResponse = data.message;
+      })
+    return llmResponse
+  }
+  </script>
+</html>
+

@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backend-deployment
+data:
+  db_url: http://weaviate.aviata-chatbot.svc.cluster.local:8080
+  backend_url: http://aviata-backend.sans.labs:8000

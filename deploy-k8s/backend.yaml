@@ -1,0 +1,46 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-deployment
+  labels:
+    app: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+      - name: backend
+        image: ahmedag/backend
+        ports:
+        - containerPort: 8000
+        env:
+        - name: OPENAI_KEY
+          valueFrom: 
+            secretKeyRef:
+              name: openai
+              key: openai-key
+        - name: DB_URL
+          valueFrom: 
+            configMapKeyRef:
+              name: backend-deployment
+              key: db_url
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+spec:
+  selector:
+    app: backend
+  type: LoadBalancer
+  ports:
+    - protocol: TCP
+      port: 8000
+      targetPort: 8000
