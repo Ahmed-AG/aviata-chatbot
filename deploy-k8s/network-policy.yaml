@@ -7,16 +7,16 @@ spec:
   podSelector: {}
   policyTypes:
   - Ingress
-  - Egress
+  # - Egress
   ingress:
   - from:
     - podSelector: {}
       namespaceSelector:
         matchLabels:
           name: aviata-chatbot
-  egress:
-  - to:
-    - podSelector: {}
-      namespaceSelector:
-        matchLabels:
-          name: aviata-chatbot
+  # egress:
+  # - to:
+  #   - podSelector: {}
+  #     namespaceSelector:
+  #       matchLabels:
+  #         name: aviata-chatbot
