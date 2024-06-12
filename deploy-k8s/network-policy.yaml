@@ -1,9 +1,9 @@
-kind: NetworkPolicy
-apiVersion: networking.k8s.io/v1
+apiVersion: projectcalico.org/v3
+kind: GlobalNetworkPolicy
 metadata:
-  name: deny-from-other-namespaces
+  name: default-deny
 spec:
-  podSelector:
-    matchLabels:
-      app: backend
-  ingress: []
+  selector: projectcalico.org/namespace != "kube-system"
+  types:
+  - Ingress
+  - Egress
