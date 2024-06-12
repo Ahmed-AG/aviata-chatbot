@@ -1,12 +1,9 @@
 kind: NetworkPolicy
 apiVersion: networking.k8s.io/v1
 metadata:
-  namespace: aviata-chatbot
   name: deny-from-other-namespaces
 spec:
   podSelector:
     matchLabels:
       app: backend
   ingress: []
-  # - from:
-  #   - podSelector: {}
