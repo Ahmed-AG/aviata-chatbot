@@ -1,4 +1,6 @@
-# Kubernetes Deployment Tutorial for GenAI Chat App
+# SANS Aviata Cloud Solo Flight Challenge
+## Chapter 3: Wings of Innovation: Transitioning to Containerization 
+## Kubernetes Deployment Tutorial for GenAI Chat App
 
 This tutorial guides you through deploying a Aviata-chatbot on Kubernetes. Aviata-chatbot is a basic GenAI chat application. The app consists of three components:
 - Weaviate (a vector database)
