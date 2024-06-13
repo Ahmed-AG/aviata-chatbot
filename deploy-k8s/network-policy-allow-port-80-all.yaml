@@ -1,0 +1,18 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-port-80-all
+  namespace: aviata-chatbot
+spec:
+  podSelector:
+    matchLabels:
+      project: aviata-chatbot
+  policyTypes:
+  - Ingress
+  ingress:
+    - ports:
+      - protocol: TCP
+        port: 80
+    - from:
+      - ipBlock:
+          cidr: 0.0.0.0/0

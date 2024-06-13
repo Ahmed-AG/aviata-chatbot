@@ -5,6 +5,7 @@ metadata:
   name: weaviate-db
   labels:
     app: weaviate
+    project: aviata-chatbot
 spec:
   replicas: 1
   selector:

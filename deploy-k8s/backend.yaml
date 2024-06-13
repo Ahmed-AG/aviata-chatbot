@@ -5,6 +5,7 @@ metadata:
   name: backend-deployment
   labels:
     app: backend
+    project: aviata-chatbot
 spec:
   replicas: 1
   selector:
