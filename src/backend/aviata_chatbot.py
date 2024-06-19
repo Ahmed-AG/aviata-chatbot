@@ -1,7 +1,9 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
-import llm
+
+from llm import llm
+from weaviatedb import weaviatedb
 
 app = FastAPI()
 app.add_middleware(
@@ -14,13 +16,15 @@ app.add_middleware(
 # LLM API
 @app.get("/api/llm")
 def read_root(q: str = None):
-    return_data = llm.call_llm(q)
-    # return {
-    #     "statusCode": 200,
-    #     "headers": {"Access-Control-Allow-Origin": "*"},
-    #     "body": return_data
-    #     }
-    return return_data
+    l = llm()
+    response = l.call_llm(q)
+    return response
+
+@app.get("/api/update-db")
+def read_root(class_name: str = "SANS_Cloud_Exchange"):
+    w = weaviatedb(class_name=class_name)
+    response = w.upload_documents()
+    return response
 
 
 @app.get("/api/hello")

@@ -1,3 +1,4 @@
+# Legacy
 # Reference: https://weaviate.io/developers/weaviate/quickstart
 import weaviate
 import json

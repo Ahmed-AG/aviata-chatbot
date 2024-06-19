@@ -1,37 +1,42 @@
 import openai
-import os
-from weaviate_class import w
+from common import common
+from weaviatedb import weaviatedb
 
-def call_llm(query):
-    prompt = create_prompt(query)
-    openai_response = call_openai(prompt)
+class llm:
+    def __init__(self, openai_key=common.get_env("OPENAI_KEY"), model="gpt-3.5-turbo", temperature=0.7):
+        self.OPENAI_APIKEY = openai_key
+        self.MODEL = model
+        self.TEMPERATURE = temperature
 
-    llm_response = {
-        "message": openai_response, 
-        # "message":"hello", 
-        "Your prompt is": query
-    }
-    return llm_response
+    def call_llm(self, query):
+        prompt = self.create_prompt(query)
+        openai_response = self.call_openai(prompt)
 
-def create_prompt(query):
-    # get relevant data from VectorDB
-    prompt = query
-    return prompt
+        llm_response = {
+            "message": openai_response,
+            # "message":"hello",
+            "Your prompt is": query
+        }
+        return llm_response
 
-def call_openai(prompt):
-    # client = OpenAI()
-    openai.api_key = get_openAIKey()
+    def create_prompt(self, query):
+        # get relevant data from VectorDB
+        w = weaviatedb(class_name="SANS_Cloud_Exchange")
+        relevant_documents = w.get_relevant_documents(query)
 
-    response = openai.chat.completions.create(
-    model="gpt-3.5-turbo",
-    temperature=0.7,
-    messages=[
-        {"role": "system", "content": "You are a helpful assistant. And your name is Aviata-chatbot."},
-        {"role": "user", "content": prompt}
-        ]
-    )
-    return response.choices[0].message.content
+        prompt = f"Use this as context: {relevant_documents}.\n{query}"
+        return str(prompt)
 
-def get_openAIKey():
-    return os.getenv('OPENAI_KEY')
+    def call_openai(self, prompt):
+        # client = OpenAI()
+        openai.api_key = self.OPENAI_APIKEY
 
+        response = openai.chat.completions.create(
+        model=self.MODEL,
+        temperature=self.TEMPERATURE,
+        messages=[
+            {"role": "system", "content": "You are a helpful assistant. And your name is Aviata-chatbot."},
+            {"role": "user", "content": prompt}
+            ]
+        )
+        return response.choices[0].message.content
