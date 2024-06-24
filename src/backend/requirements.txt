@@ -2,3 +2,6 @@ fastapi==0.111.0
 pydantic==2.7.2
 openai
 weaviate-client
+google-api-python-client
+google-auth-httplib2
+google-auth-oauthlib

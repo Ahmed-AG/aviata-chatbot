@@ -1,0 +1,10 @@
+aviata_chatbot:
+  API Gateway
+  Application logic
+llm
+  LLM Operations
+weaviate
+  Weaviate Operations
+split_documents
+common.py
+google.py

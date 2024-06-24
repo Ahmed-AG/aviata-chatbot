@@ -48,6 +48,7 @@ metadata:
 spec:
   selector:
     app: weaviate
+  type: LoadBalancer # For testing only
   ports:
     - protocol: TCP
       port: 8080
