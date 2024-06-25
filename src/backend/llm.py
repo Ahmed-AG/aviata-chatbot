@@ -1,6 +1,7 @@
 import openai
 from common import common
 from weaviatedb import weaviatedb
+from langchain_agents import agent_run
 
 class llm:
     def __init__(self, openai_key=common.get_env("OPENAI_KEY"), model="gpt-3.5-turbo", temperature=0.7):
@@ -40,3 +41,12 @@ class llm:
             ]
         )
         return response.choices[0].message.content
+
+    def call_langchain(self, query):
+        langchain_response = agent_run(query)
+        response = {
+            "message": langchain_response,
+            # "message":"hello",
+            "Your prompt is": query
+        }
+        return response

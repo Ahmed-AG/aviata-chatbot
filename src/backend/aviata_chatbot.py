@@ -17,8 +17,18 @@ app.add_middleware(
 @app.get("/api/llm")
 def read_root(q: str = None):
     l = llm()
-    response = l.call_llm(q)
+    # response = l.call_llm(q)
+    response = l.call_langchain(q)
+    print(response)
+
     return response
+
+# # LLM API
+# @app.get("/api/lc")
+# def read_root(q: str = None):
+#     l = llm()
+#     response = l.call_langchain(q)
+#     return response
 
 @app.get("/api/update-db")
 def read_root(class_name: str = "SANS_Cloud_Exchange"):
