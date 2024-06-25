@@ -23,12 +23,12 @@ spec:
         - containerPort: 8000
         env:
         - name: OPENAI_KEY
-          valueFrom: 
+          valueFrom:
             secretKeyRef:
               name: openai
               key: openai-key
         - name: DB_URL
-          valueFrom: 
+          valueFrom:
             configMapKeyRef:
               name: backend-deployment
               key: db_url
