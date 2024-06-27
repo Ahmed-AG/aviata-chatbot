@@ -16,7 +16,7 @@ class gcalendar:
     self.SCOPES = SCOPES
     self.SERVICE_ACCOUNT_FILE = SERVICE_ACCOUNT_FILE
     self.CALENDAR_ID = CALENDAR_ID
-  
+
   def get_events(self, MAX_RESULTS=10):
     creds = service_account.Credentials.from_service_account_file(self.SERVICE_ACCOUNT_FILE, scopes=self.SCOPES)
     try:
@@ -25,7 +25,7 @@ class gcalendar:
       # Call the Calendar API
       now = datetime.datetime.utcnow().isoformat() + "Z"  # 'Z' indicates UTC time
       print(f"Getting the upcoming {MAX_RESULTS} events")
-      
+
       events_result = (
           service.events()
           .list(
@@ -61,7 +61,6 @@ class gcal(BaseTool):
 
     def _run(self, query: str) -> str:
         """Reads calendar items."""
-        print("XXXXXX Entering the CALENDAR tool")
         c = gcalendar()
         response = c.get_events(5)
         # print(response)
