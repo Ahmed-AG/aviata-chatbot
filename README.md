@@ -8,3 +8,8 @@ This tutorial guides you through deploying a Aviata-chatbot on Kubernetes. Aviat
 - A frontend using NGINX to host a HTML and JavaScript UI.
 
 Refer to: [https://aviata.cloud/](https://aviata.cloud/)
+
+## Aviata-chatbot
+
+The Aviata-chatbot also serves as a vulnerable GenAI application used for research purposes
+![alt text](images/aviata-chatbot.png?raw=true)
