@@ -1,14 +1,15 @@
+import sys
 from langchain.agents import Tool, AgentExecutor, LLMSingleActionAgent, AgentOutputParser
 from langchain.prompts import StringPromptTemplate
 from langchain import OpenAI, SerpAPIWrapper, LLMChain
 from typing import List, Union
 from langchain.schema import AgentAction, AgentFinish
 import re
-# from langchain.utilities import BashProcess
+
 from langchain.tools.human.tool import HumanInputRun
-from agents.gcal import gcal
-from agents.custom_openai import custom_openai
-import sys
+from agent_tool_gcal import gcal
+from agent_tool_custom_openai import custom_openai
+from agent_tool_search_vector_db import search_vector_db
 
 # Set up a prompt template
 class CustomPromptTemplate(StringPromptTemplate):
@@ -16,7 +17,7 @@ class CustomPromptTemplate(StringPromptTemplate):
     template: str
     # The list of tools available
     tools: List[Tool]
-    
+
     def format(self, **kwargs) -> str:
         # Get the intermediate steps (AgentAction, Observation tuples)
         # Format them in a particular way
@@ -34,7 +35,7 @@ class CustomPromptTemplate(StringPromptTemplate):
         return self.template.format(**kwargs)
 
 class CustomOutputParser(AgentOutputParser):
-    
+
     def parse(self, llm_output: str) -> Union[AgentAction, AgentFinish]:
         # Check if agent should finish
         if "Final Answer:" in llm_output:
@@ -59,6 +60,8 @@ def agent_run(user_input) -> None:
     # Define which tools the agent can use to answer user queries
     search = SerpAPIWrapper()
     cal = gcal()
+    cal = gcal()
+    searchVectorDB = search_vector_db()
     # custom_llm = custom_openai()
 
     tools = [
@@ -66,6 +69,11 @@ def agent_run(user_input) -> None:
             name="Search",
             func=search.run,
             description="useful for when you need to answer questions about current events"
+        ),
+        Tool(
+            name="Search Vector DB",
+            func=searchVectorDB.run,
+            description="useful for when you need to answer questions SANS cloud exchange, this will get the information from a vector DB"
         ),
         # Tool(
         #     name="GenAI",
