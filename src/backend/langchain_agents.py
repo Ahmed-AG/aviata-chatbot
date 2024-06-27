@@ -7,6 +7,7 @@ import re
 # from langchain.utilities import BashProcess
 from langchain.tools.human.tool import HumanInputRun
 from agents.gcal import gcal
+from agents.custom_openai import custom_openai
 import sys
 
 # Set up a prompt template
@@ -58,6 +59,7 @@ def agent_run(user_input) -> None:
     # Define which tools the agent can use to answer user queries
     search = SerpAPIWrapper()
     cal = gcal()
+    # custom_llm = custom_openai()
 
     tools = [
         Tool(
@@ -65,6 +67,11 @@ def agent_run(user_input) -> None:
             func=search.run,
             description="useful for when you need to answer questions about current events"
         ),
+        # Tool(
+        #     name="GenAI",
+        #     func=custom_llm.run,
+        #     description="useful to summerize existing results or to understand existing results or to asnwer the final question after you have results"
+        # ),
         Tool(
             name="Google Calendar",
             func=cal.run,
